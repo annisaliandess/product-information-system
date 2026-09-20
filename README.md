@@ -1,45 +1,61 @@
-# Blueprint Mini Project 1: Product Information System
-**Tema Studi Kasus:** Inventaris Material Toko Bangunan
+# Mini Project 1: Product Information System (Blueprint)
 
-**Deskripsi Singkat:**
-Proyek ini merupakan rancangan cetak biru (blueprint) untuk sistem manajemen inventaris material bangunan. Sistem dirancang menggunakan pendekatan modular (pemisahan layer data, logika, dan presentasi) tanpa implementasi kode akhir, guna mempersiapkan alur logika arsitektur yang matang.
+**Mata Kuliah:** Pemrograman Web  
+**Fokus Proyek:** Perancangan Arsitektur Modular & Pemisahan Layer (*Separation of Concerns*)
 
 ---
 
-## Arsitektur Desain Konseptual
+## 1. Ringkasan Proyek
+Proyek ini adalah rancangan cetak biru (*blueprint*) untuk sistem manajemen inventaris produk berbasis web. Sesuai instruksi akademik, sesi ini berfokus murni pada perancangan logika arsitektur dan pemisahan tanggung jawab kode di atas kertas, tanpa implementasi kode PHP aktif (*Sesi Tanpa Coding*).
 
-Sistem ini dipecah menjadi tiga bagian utama agar lebih rapi dan terstruktur:
+---
 
-### 1. Data Layer (`products.php`)
-**Fungsi:** 
-Bertugas sebagai tempat penyimpanan data sementara (pengganti database utama).
+## 2. Struktur Direktori Proyek
+Berikut adalah rancangan tata letak folder dan file yang direncanakan untuk menjaga kerapian proyek:
 
-**Logika Desain:**
-Data inventaris akan disimpan dalam bentuk array multidimensi. Tiap item material di dalamnya wajib memiliki atribut: ID, Nama, Kategori, Harga, Stok, dan Deskripsi.
+product-information-system/
+│
+├── README.md         # Dokumentasi & cetak biru arsitektur sistem
+├── products.php      # Data Layer (Penyimpanan array multidimensi)
+├── functions.php     # Processing Layer (Logika bisnis & fungsi matematika)
+└── index.php         # Presentation Layer (Antarmuka HTML & integrasi modul)
 
-*Contoh Pseudocode Data:*
-```text
-Data_Material = [
-  [ID: "TB-01", Nama: "Semen Padang 50kg", Kategori: "Material Dasar", Harga: 65000, Stok: 45, Deskripsi: "Semen abu-abu sak"],
-  [ID: "TB-02", Nama: "Cat Tembok Putih 5kg", Kategori: "Finishing", Harga: 150000, Stok: 2, Deskripsi: "Cat interior (Stok Kritis)"],
-  [ID: "TB-03", Nama: "Pipa PVC 1/2 Inch", Kategori: "Plumbing", Harga: 25000, Stok: 120, Deskripsi: "Pipa air per batang"]
-]
-```
-### 2. Processing Layer (`functions.php`)
-**Fungsi:**
-Merupakan pusat logika yang murni memproses hitung-hitungan matematis dan aturan kondisi (tanpa ada sintaks tampilan HTML).
+---
 
-**Logika Desain:**
-- **Fungsi `hitungTotalAset`:** Sistem akan melakukan perulangan pada Data Layer untuk mengalikan *Harga* dan *Stok* dari masing-masing material. Hasil perkalian dari seluruh material kemudian dijumlahkan untuk mendapat total nilai aset toko.
-- **Aturan Stok Kritis:** Membuat pengecekan kondisi (If/Else). Jika ada material yang nilai stoknya di bawah 3 (seperti Cat Tembok pada contoh di atas), sistem akan menyiapkan penanda status kritis.
+## 3. Pembagian Arsitektur & Logika Desain
 
-### 3. Presentation Layer (`index.php`)
-**Fungsi:**
-Berfungsi sebagai antarmuka (User Interface) yang menggabungkan data dan fungsi untuk ditampilkan ke layar pengguna dalam wujud tabel HTML.
+Sistem dipecah menjadi tiga modul utama agar kode terisolasi dengan baik:
 
-**Logika Desain:**
-- File ini pertama-tama akan mengimpor komponen dari `products.php` dan `functions.php`.
-- Dibuat kerangka layout tabel HTML.
-- Dilakukan perulangan (foreach) untuk membaca setiap isi array material dan mencetaknya ke dalam baris dan kolom tabel.
-- **Penerapan Aturan Visual:** Saat merender tabel, sistem akan mengecek status dari Processing Layer. Untuk material dengan stok kritis (< 3), baris tabelnya akan diberi warna latar khusus (misalnya merah) sebagai peringatan visual bagi admin toko.
-- Di bawah tabel, sistem memanggil fungsi `hitungTotalAset` untuk menampilkan hasil akhir penjumlahan aset ke layar.
+### A. Data Layer (`products.php`)
+* **Tujuan:** Berfungsi sebagai *mock database* sementara sebelum terhubung ke sistem basis data permanen.
+* **Mekanisme:** Menggunakan struktur data *multidimensional associative array*. Setiap entitas produk wajib memiliki atribut konsisten:
+  * `id` (Identifikasi unik produk)
+  * `nama` (Nama komoditas produk)
+  * `kategori` (Klasifikasi jenis produk)
+  * `harga` (Nilai satuan produk)
+  * `stok` (Jumlah ketersediaan barang di gudang)
+  * `deskripsi` (Keterangan singkat spesifikasi produk)
+
+### B. Processing Layer (`functions.php`)
+* **Tujuan:** Pusat pemrosesan data, kalkulasi matematis, dan evaluasi aturan bisnis (bebas dari elemen HTML).
+* **Fungsi Utama:**
+  * **`hitungTotalAset($data)`:** Melakukan perulangan (*traversal*) pada array produk, mengalikan harga dengan stok setiap item, lalu mengakumulasikannya untuk mendapatkan total nilai aset keseluruhan.
+  * **Pengecekan Stok Kritis:** Menerapkan evaluasi kondisional (`if/else`). Jika ditemukan produk dengan jumlah stok di bawah batas minimal (misal < 3), sistem menandainya sebagai status kritis.
+
+### C. Presentation Layer (`index.php`)
+* **Tujuan:** Antarmuka pengguna (*User Interface*) yang menyajikan data ke peramban web.
+* **Alur Kerja:**
+  * Memuat file komponen menggunakan mekanisme modular `require_once`.
+  * Merender data produk ke dalam bentuk baris dan kolom tabel HTML menggunakan *looping* (`foreach`).
+  * **Penerapan Aturan Visual:** Memberikan penanda warna latar khusus pada baris tabel bagi produk yang berstatus stok kritis sebagai peringatan dini bagi administrator.
+  * Menampilkan hasil kalkulasi akhir total nilai aset gudang di bagian bawah halaman.
+
+---
+
+## 4. Alur Kerja Sistem (*Data Flow*)
+1. File `index.php` dijalankan oleh server.
+2. File tersebut memanggil `products.php` untuk mengambil data mentah berupa array.
+3. File tersebut memanggil `functions.php` untuk memproses perhitungan aset dan evaluasi status stok.
+4. Data yang sudah siap dirakit dan dicetak ke dalam tabel HTML untuk ditampilkan ke layar pengguna.
+
+---
